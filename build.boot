@@ -4,10 +4,10 @@
                     "server/grammar" "examples" "resources"}
   :dependencies '[
                   ; dev
-                  [adzerk/bootlaces    "0.1.12" :scope "test"]
-                  [adzerk/boot-jar2bin "1.1.0"  :scope "test"]
-                  [adzerk/boot-test    "1.0.4"  :scope "test"]
-                  [str-to-argv         "0.1.0"  :score "test"]
+                  [adzerk/bootlaces      "0.1.12" :scope "test"]
+                  [adzerk/boot-jar2bin   "1.1.0"  :scope "test"]
+                  [metosin/boot-alt-test "0.1.2"  :scope "test"]
+                  [str-to-argv           "0.1.0"  :score "test"]
 
                   ; shared
                   [org.zeromq/jeromq "0.3.5"]
@@ -35,9 +35,9 @@
                   [org.fusesource.jansi/jansi           "1.11"]
                   [us.bpsm/edn-java                     "0.4.6"]])
 
-(require '[adzerk.bootlaces    :refer :all]
-         '[adzerk.boot-jar2bin :refer :all]
-         '[adzerk.boot-test]
+(require '[adzerk.bootlaces      :refer :all]
+         '[adzerk.boot-jar2bin   :refer :all]
+         '[metosin.boot-alt-test :refer :all]
          '[alda.version])
 
 ; version number is stored in alda.version
@@ -100,42 +100,14 @@
 (deftask unit-tests
   []
   (comp (heading :text "UNIT TESTS")
-        (adzerk.boot-test/test
-          :namespaces '#{; general tests
-                         alda.parser.barlines-test
-                         alda.parser.clj-exprs-test
-                         alda.parser.event-sequences-test
-                         alda.parser.comments-test
-                         alda.parser.duration-test
-                         alda.parser.events-test
-                         alda.parser.octaves-test
-                         alda.parser.repeats-test
-                         alda.parser.score-test
-                         alda.parser.variables-test
-                         alda.lisp.attributes-test
-                         alda.lisp.cram-test
-                         alda.lisp.chords-test
-                         alda.lisp.code-test
-                         alda.lisp.duration-test
-                         alda.lisp.global-attributes-test
-                         alda.lisp.markers-test
-                         alda.lisp.notes-test
-                         alda.lisp.parts-test
-                         alda.lisp.pitch-test
-                         alda.lisp.score-test
-                         alda.lisp.variables-test
-                         alda.lisp.voices-test
-                         alda.util-test
-
-                         ; benchmarks / smoke tests
-                         alda.examples-test})))
+        (alt-test :parallel false
+                  :test-matcher #"alda\.(parser|lisp|util|examples).*-test")))
 
 (deftask integration-tests
   []
   (comp (heading :text "INTEGRATION TESTS")
-        (adzerk.boot-test/test
-          :namespaces '#{alda.server-test
-                         alda.worker-test})))
+        (alt-test :parallel false
+                  :test-matcher #"alda\.(server|worker)-test")))
 
 (deftask test
   [i integration bool "Run only integration tests."
